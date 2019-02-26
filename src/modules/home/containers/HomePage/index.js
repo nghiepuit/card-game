@@ -112,7 +112,7 @@ class HomePage extends Component {
                     {player.name} {player.isMine ? "(me)" : ""}
                   </td>
                   <td className={classes.tablePadding10px}>
-                    {player.point} point
+                    {Math.round(player.point)} point
                   </td>
                 </tr>
               );
