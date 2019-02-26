@@ -27,7 +27,7 @@ class GameOver extends Component {
               return (
                 <tr key={player.id}>
                   <td>{player.name}</td>
-                  <td>{player.point} Điểm</td>
+                  <td>{Math.round(player.point)} Điểm</td>
                 </tr>
               );
             })}
