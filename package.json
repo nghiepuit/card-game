@@ -1,0 +1,82 @@
+{
+  "name": "card",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@material-ui/core": "^3.4.0",
+    "@material-ui/icons": "^3.0.1",
+    "@tinymce/tinymce-react": "^2.4.0",
+    "axios": "^0.18.0",
+    "classnames": "^2.2.6",
+    "draft-js-emoji-plugin": "^2.1.1",
+    "es6-promise": "^4.2.5",
+    "history": "^4.7.2",
+    "html-to-react": "^1.3.4",
+    "immutable": "^3.8.2",
+    "isomorphic-fetch": "^2.2.1",
+    "lodash": "^4.17.11",
+    "moment": "^2.22.2",
+    "nprogress": "^0.2.0",
+    "oidc-client": "^1.5.4",
+    "prop-types": "^15.6.2",
+    "query-string": "^6.2.0",
+    "react": "16.7.0",
+    "react-content-loader": "^3.4.1",
+    "react-datepicker": "^2.0.0",
+    "react-dom": "16.7.0",
+    "react-helmet": "^5.2.0",
+    "react-json-view": "^1.19.1",
+    "react-placeholder": "^3.0.1",
+    "react-redux": "^5.0.7",
+    "react-router-breadcrumbs-hoc": "^2.1.5",
+    "react-router-config": "^4.4.0-beta.1",
+    "react-router-dom": "^4.3.1",
+    "react-router-redux": "^5.0.0-alpha.9",
+    "react-scripts": "2.0.4",
+    "react-select": "^2.1.1",
+    "react-slick": "^0.23.2",
+    "react-sortable-hoc": "^0.8.4",
+    "react-spinkit": "^3.0.0",
+    "react-swipeable-views": "^0.13.0",
+    "react-times": "^3.1.10",
+    "react-toastify": "^4.4.0",
+    "redux": "^4.0.0",
+    "redux-freeze": "^0.1.7",
+    "redux-immutable": "^4.0.0",
+    "redux-saga": "^0.16.2",
+    "redux-thunk": "^2.3.0",
+    "reselect": "^4.0.0",
+    "shiitake": "^2.2.4",
+    "slick-carousel": "^1.8.1",
+    "styled-components": "^4.0.2",
+    "tinymce-emoji": "^0.1.4",
+    "truncate": "^2.0.1",
+    "uuid": "^3.3.2"
+  },
+  "scripts": {
+    "start": "better-npm-run dev",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "storybook": "start-storybook -p 9001 -c ./storybook"
+  },
+  "betterScripts": {
+    "dev": {
+      "command": "react-scripts start"
+    }
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ],
+  "devDependencies": {
+    "@storybook/react": "^3.4.11",
+    "better-npm-run": "^0.1.1",
+    "redux-devtools-extension": "^2.13.7"
+  }
+}
