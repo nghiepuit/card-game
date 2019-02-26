@@ -20,3 +20,9 @@ export const drawCard = () => {
     type: types.DRAW_CARD
   };
 };
+
+export const revealAllCard = () => {
+  return {
+    type: types.REVEAL
+  };
+};

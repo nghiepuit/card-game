@@ -3,7 +3,6 @@ const styles = () => ({
     textAlign: "center"
   },
   board: {
-    
     backgroundColor: "#00a000",
     color: "#fff",
     padding: 10,
@@ -14,7 +13,7 @@ const styles = () => ({
   listPlayers: {
     position: "relative",
     width: "100%",
-    minHeight: 600,
+    minHeight: 600
   },
   topPlayer: {
     position: "absolute",
@@ -25,7 +24,7 @@ const styles = () => ({
   },
   rightPlayer: {
     position: "absolute",
-    top: "48%",
+    top: "40%",
     right: 2,
     display: "flex",
     flexDirection: "column",
@@ -34,14 +33,14 @@ const styles = () => ({
   },
   bottomPlayer: {
     position: "absolute",
-    bottom: 2,
+    bottom: 14,
     left: "40%",
     textAlign: "center",
     minWidth: 200
   },
   leftPlayer: {
     position: "absolute",
-    top: "48%",
+    top: "40%",
     left: 2,
     textAlign: "center",
     display: "flex",
@@ -74,7 +73,8 @@ const styles = () => ({
     paddingLeft: "100%"
   },
   faceLeftPlayer: {
-    backgroundImage: "url(https://cardgames.io/shared/images/svg/face-mike.svg)",
+    backgroundImage:
+      "url(https://cardgames.io/shared/images/svg/face-mike.svg)",
     backgroundPosition: " center !important",
     backgroundRepeat: "no-repeat",
     paddingLeft: "100%"
@@ -102,6 +102,24 @@ const styles = () => ({
   },
   card: {
     height: 100
+  },
+  marginHorizontal5px: {
+    marginLeft: 5,
+    marginRight: 5
+  },
+  wrapperCard: {
+    position: "relative"
+  },
+  point: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "yellow",
+    position: "absolute",
+    top: "100%",
+    left: "30%"
+  },
+  bu: {
+    left: "43% !important"
   }
 });
 

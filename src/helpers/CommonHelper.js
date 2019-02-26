@@ -1,12 +1,9 @@
 import moment from "moment";
 import React from "react";
 import ContentLoader from "react-content-loader";
-import {
-  GLOBAL_ADMIN,
-  PERMISSIONS,
-  FORMAT_DATE,
-  FORMAT_DATE_WITHOUT_TIME
-} from "../constants";
+import { FORMAT_DATE, FORMAT_DATE_WITHOUT_TIME } from "../constants";
+import { THREE_FIRST_LIST, THREE_FIRST, ACE } from "../modules/home/constants";
+import { max } from "lodash";
 
 export const formatDate = (dateString, format = FORMAT_DATE) => {
   // const dateTime = new Date(dateString);
@@ -39,9 +36,9 @@ export function getSorting(order, orderBy) {
 
 export function diff(a, b) {
   let matches = [];
-  for ( let i = 0; i < a.length; i++ ) {
-    for ( let e = 0; e < b.length; e++ ) {
-      if ( a[i] === b[e] ) matches.push( a[i] );
+  for (let i = 0; i < a.length; i++) {
+    for (let e = 0; e < b.length; e++) {
+      if (a[i] === b[e]) matches.push(a[i]);
     }
   }
   return matches;
@@ -219,4 +216,43 @@ export function showCircleLoading() {
         r="160" />
     </ContentLoader>
   );
+}
+
+export function isThreeFirst(cards) {
+  let result = true;
+  for (let i = 0; i < cards.length; i++) {
+    const card = cards[i];
+    if (card && THREE_FIRST_LIST.indexOf(card.value) === -1) {
+      result = false;
+    }
+  }
+  return result;
+}
+
+export function getPointOfCards(cards) {
+  if (isThreeFirst(cards)) {
+    return THREE_FIRST;
+  } else {
+    let result = 0;
+    for (let i = 0; i < cards.length; i++) {
+      const card = cards[i];
+      if (card && THREE_FIRST_LIST.indexOf(card.value) !== -1) {
+        result += 10;
+      } else if (card && card.value === ACE) {
+        result += 1;
+      } else {
+        result += +card.value;
+      }
+    }
+    return getPoint(result);
+  }
+}
+
+export function getPoint(number) {
+  const strNumber = number.toString();
+  return strNumber.substring(strNumber.length - 1);
+}
+
+export function getMaxPoint(listPoint) {
+  return max(listPoint);
 }

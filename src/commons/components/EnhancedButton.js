@@ -50,10 +50,13 @@ const styles = theme => ({
     backgroundColor: "#000000 !important",
     backgroundImage: "linear-gradient(to bottom, #000000, #000000) !important",
     color: "#ffed00 !important",
-    padding: "0 20px 0 0"
+    padding: "0 20px 0 0px"
   },
   spinner: {
     maxHeight: 44
+  },
+  paddingLeft10px: {
+    paddingLeft: 10
   }
 });
 
@@ -83,9 +86,11 @@ const EnhancedButton = ({
       variant={variant}
     >
       {loading && (
-        <img alt="spinner"
-          className={classes.spinner}
-          src={spinner} />
+        <img
+          alt="spinner"
+          className={cn(classes.spinner, loading && classes.paddingLeft10px)}
+          src={spinner}
+        />
       )}
       {children}
     </Button>

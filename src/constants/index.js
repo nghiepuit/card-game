@@ -5,6 +5,9 @@ export const ROUTE = {
   ROUTE_HOME: "/home"
 };
 
+export const FORMAT_DATE = "DD MMM, YYYY HH:mm:ss";
+export const FORMAT_DATE_WITHOUT_TIME = "DD MMM, YYYY";
+
 export const DEV_API_URL = "https://deckofcardsapi.com/api";
 
 export const ROOT_API_URL = DEV_API_URL;

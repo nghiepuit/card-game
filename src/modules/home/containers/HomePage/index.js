@@ -1,5 +1,6 @@
 import { withStyles } from "@material-ui/core/styles";
 import cn from "classnames";
+import { UpsertModal } from "commons/components";
 import { HomeLayout } from "commons/layouts";
 import injectReducer from "core/reducer/inject-reducer";
 import injectSaga from "core/saga/inject-saga";
@@ -10,14 +11,18 @@ import { connect } from "react-redux";
 import { compose } from "redux";
 import { createStructuredSelector } from "reselect";
 import EnhancedButton from "../../../../commons/components/EnhancedButton";
-import { loadDeck, startGame, drawCard } from "../../actions";
-import { FEATURE_NAME } from "../../constants";
+import { drawCard, loadDeck, revealAllCard, startGame } from "../../actions";
+import GameOver from "../../components/GameOver";
+import { FEATURE_NAME, THREE_FIRST, THREE_FIRST_TEXT } from "../../constants";
 import reducer from "./../../reducers/home";
 import saga from "./../../sagas/home";
 import {
   selectAllPlayers,
   selectCurrentRound,
-  selectShuffled
+  selectDrawStatus,
+  selectIsGameOver,
+  selectShuffled,
+  selectShuffleLoading
 } from "./../../selectors";
 import styles from "./styles";
 
@@ -26,6 +31,8 @@ class HomePage extends Component {
     super(props);
     this.handleStartGame = this.handleStartGame.bind(this);
     this.handleDraw = this.handleDraw.bind(this);
+    this.handleRevealAll = this.handleRevealAll.bind(this);
+    this.handleCloseModalGameOver = this.handleCloseModalGameOver.bind(this);
   }
 
   componentDidMount() {
@@ -33,6 +40,10 @@ class HomePage extends Component {
     if (loadDeck) {
       loadDeck();
     }
+  }
+
+  handleCloseModalGameOver() {
+    window.location.reload();
   }
 
   handleStartGame() {
@@ -49,31 +60,39 @@ class HomePage extends Component {
     }
   }
 
-  renderScoreTable() {
-    const { classes, isShuffled } = this.props;
-    let players = [];
-    if (this.props.players instanceof Array) {
-      players = this.props.players;
-    } else {
-      players = this.props.players.toJS();
+  handleRevealAll() {
+    const { revealAllCard } = this.props;
+    if (revealAllCard) {
+      revealAllCard();
     }
+  }
+
+  renderScoreTable() {
+    const { classes, isShuffled, isDrawing, isGameOver, isShuffleLoading } = this.props;
+    const players = this.getPlayers();
     let xhtml = null;
     xhtml = (
       <div className={classes.wrapperTopRight}>
         <div className={classes.wrapperActionButton}>
-          <EnhancedButton disabled={isShuffled}
-            onClick={this.handleStartGame}>
+          <EnhancedButton
+            disabled={isShuffled || isGameOver || isShuffleLoading}
+            loading={isShuffleLoading}
+            onClick={this.handleStartGame}
+          >
             Shuffle
           </EnhancedButton>
           <EnhancedButton
             className="marginTop10px"
-            disabled={!isShuffled}
+            disabled={!isShuffled || isDrawing || isGameOver || isShuffleLoading}
             onClick={this.handleDraw}
           >
             Draw
           </EnhancedButton>
-          <EnhancedButton className="marginTop10px"
-            disabled={!isShuffled}>
+          <EnhancedButton
+            className="marginTop10px"
+            disabled={!isShuffled || !isDrawing || isGameOver || isShuffleLoading}
+            onClick={this.handleRevealAll}
+          >
             Reveal
           </EnhancedButton>
         </div>
@@ -107,20 +126,26 @@ class HomePage extends Component {
 
   renderTopPlayer() {
     const { classes } = this.props;
-    let players = [];
-    if (this.props.players instanceof Array) {
-      players = this.props.players;
-    } else {
-      players = this.props.players.toJS();
+    const players = this.getPlayers();
+    let renderCard = null;
+    if (players[0] && players[0].point > 0) {
+      renderCard = (
+        <>
+          {players[0].cards.length > 0 &&
+            players[0].cards[0].isFaceDown &&
+            this.renderCardFaceDown()}
+          {players[0].cards.length > 0 &&
+            players[0].cards[0].isFaceDown === false &&
+            this.renderCardFaceUp(players[0])}
+        </>
+      );
     }
     let xhtml = null;
     xhtml = (
       <div className={classes.topPlayer}>
         <div className={cn(classes.faceSmall, classes.faceTopPlayer)} />
         <span className={classes.playerName}>{players[0].name}</span>
-        {players[0].cards.length > 0 &&
-          players[0].cards[0].isFaceDown &&
-          this.renderCardFaceDown()}
+        {renderCard}
       </div>
     );
     return xhtml;
@@ -128,20 +153,26 @@ class HomePage extends Component {
 
   renderRightPlayer() {
     const { classes } = this.props;
-    let players = [];
-    if (this.props.players instanceof Array) {
-      players = this.props.players;
-    } else {
-      players = this.props.players.toJS();
-    }
+    const players = this.getPlayers();
     let xhtml = null;
+    let renderCard = null;
+    if (players[1] && players[1].point > 0) {
+      renderCard = (
+        <>
+          {players[1].cards.length > 0 &&
+            players[1].cards[0].isFaceDown &&
+            this.renderCardFaceDown()}
+          {players[1].cards.length > 0 &&
+            players[1].cards[0].isFaceDown === false &&
+            this.renderCardFaceUp(players[1])}
+        </>
+      );
+    }
     xhtml = (
       <div className={classes.rightPlayer}>
         <div className={cn(classes.faceSmall, classes.faceRightPlayer)} />
         <span className={classes.playerName}>{players[1].name}</span>
-        {players[0].cards.length > 0 &&
-          players[0].cards[0].isFaceDown &&
-          this.renderCardFaceDown()}
+        {renderCard}
       </div>
     );
     return xhtml;
@@ -150,19 +181,12 @@ class HomePage extends Component {
   renderBottomPlayer() {
     const { classes } = this.props;
     let xhtml = null;
-    let players = [];
-    if (this.props.players instanceof Array) {
-      players = this.props.players;
-    } else {
-      players = this.props.players.toJS();
-    }
+    const players = this.getPlayers();
     xhtml = (
       <div className={classes.bottomPlayer}>
         <div className={cn(classes.faceSmall, classes.faceBottomPlayer)} />
         <span className={classes.playerName}>{players[2].name}</span>
-        {players[0].cards.length > 0 &&
-          players[0].cards[0].isFaceDown &&
-          this.renderCardFaceDown()}
+        {this.renderMyCards()}
       </div>
     );
     return xhtml;
@@ -171,19 +195,25 @@ class HomePage extends Component {
   renderLeftPlayer() {
     const { classes } = this.props;
     let xhtml = null;
-    let players = [];
-    if (this.props.players instanceof Array) {
-      players = this.props.players;
-    } else {
-      players = this.props.players.toJS();
+    const players = this.getPlayers();
+    let renderCard = null;
+    if (players[3] && players[3].point > 0) {
+      renderCard = (
+        <>
+          {players[3].cards.length > 0 &&
+            players[3].cards[0].isFaceDown &&
+            this.renderCardFaceDown()}
+          {players[3].cards.length > 0 &&
+            players[3].cards[0].isFaceDown === false &&
+            this.renderCardFaceUp(players[3])}
+        </>
+      );
     }
     xhtml = (
       <div className={classes.leftPlayer}>
         <div className={cn(classes.faceSmall, classes.faceLeftPlayer)} />
         <span className={classes.playerName}>{players[3].name}</span>
-        {players[0].cards.length > 0 &&
-          players[0].cards[0].isFaceDown &&
-          this.renderCardFaceDown()}
+        {renderCard}
       </div>
     );
     return xhtml;
@@ -196,7 +226,10 @@ class HomePage extends Component {
       xhtml.push(
         <img
           alt=""
-          className={classes.card}
+          className={cn(
+            classes.card,
+            i === 1 ? classes.marginHorizontal5px : ""
+          )}
           key={i}
           src="https://ic.pics.livejournal.com/dailyafirmation/691132/529371/529371_original.jpg"
         />
@@ -205,14 +238,93 @@ class HomePage extends Component {
     return <div className={classes.wrapperCard}>{xhtml}</div>;
   }
 
-  renderAllPlayers() {
-    const { classes, currentRound } = this.props;
+  renderCardFaceUp(player) {
+    const { classes } = this.props;
+    let xhtml = [];
+    if (player && player.cards && player.cards.length > 0) {
+      for (let i = 0; i < 3; i++) {
+        xhtml.push(
+          <img
+            alt=""
+            className={cn(
+              classes.card,
+              i === 1 ? classes.marginHorizontal5px : ""
+            )}
+            key={i}
+            src={player.cards[i].image}
+          />
+        );
+      }
+    }
+    return (
+      <div className={classes.wrapperCard}>
+        {this.renderPoint(player)}
+        {xhtml}
+      </div>
+    );
+  }
+
+  renderPoint(player) {
+    const { classes } = this.props;
+    let xhtml = null;
+    if (player && player.value) {
+      let point = player.value;
+      if (point === THREE_FIRST) {
+        xhtml = <span className={classes.point}>{THREE_FIRST_TEXT}</span>;
+      } else if (point === "0") {
+        xhtml = <span className={cn(classes.point, classes.bu)}>Bù</span>;
+      } else {
+        xhtml = <span className={classes.point}>{point} Điểm</span>;
+      }
+    }
+    return xhtml;
+  }
+
+  getPlayers() {
     let players = [];
     if (this.props.players instanceof Array) {
       players = this.props.players;
     } else {
       players = this.props.players.toJS();
     }
+    return players;
+  }
+
+  renderMyCards() {
+    const { classes } = this.props;
+    const players = this.getPlayers();
+    const me = players.find(player => player.isMine === true);
+    let xhtml = [];
+    if (me && me.cards && me.cards.length > 0) {
+      for (let i = 0; i < 3; i++) {
+        xhtml.push(
+          <img
+            alt=""
+            className={cn(
+              classes.card,
+              i === 1 ? classes.marginHorizontal5px : ""
+            )}
+            key={i}
+            src={me.cards[i].image}
+          />
+        );
+      }
+    }
+    if (me.point > 0) {
+      return (
+        <div className={classes.wrapperCard}>
+          {xhtml}
+          {this.renderPoint(me)}
+        </div>
+      );
+    } else {
+      return null;
+    }
+  }
+
+  renderAllPlayers() {
+    const { classes, currentRound } = this.props;
+    const players = this.getPlayers();
     let xhtml = null;
     if (players && players.length > 0) {
       xhtml = (
@@ -237,7 +349,7 @@ class HomePage extends Component {
   }
 
   render() {
-    const { classes } = this.props;
+    const { classes, players, isGameOver } = this.props;
     return (
       <HomeLayout>
         <Helmet>
@@ -249,6 +361,17 @@ class HomePage extends Component {
           <h1 className={classes.title}>Card Game</h1>
           <div className={classes.container}>{this.renderBoard()}</div>
         </div>
+        <UpsertModal
+          content={
+            <GameOver
+              onHandleRestartGame={this.handleCloseModalGameOver}
+              players={players}
+            />
+          }
+          isShow={isGameOver}
+          onClose={this.handleCloseModalGameOver}
+          title="Game Over"
+        />
       </HomeLayout>
     );
   }
@@ -256,12 +379,16 @@ class HomePage extends Component {
 
 HomePage.propTypes = {
   classes: PropTypes.object.isRequired,
-  players: PropTypes.oneOfType(PropTypes.object, PropTypes.array),
+  players: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
   currentRound: PropTypes.number.isRequired,
   loadDeck: PropTypes.func,
   startGame: PropTypes.func,
   drawCard: PropTypes.func,
-  isShuffled: PropTypes.bool
+  revealAllCard: PropTypes.func,
+  isShuffled: PropTypes.bool,
+  isDrawing: PropTypes.bool,
+  isGameOver: PropTypes.bool,
+  isShuffleLoading: PropTypes.bool
 };
 
 HomePage.defaultProps = {};
@@ -276,6 +403,9 @@ const mapDispatchToProps = dispatch => {
     },
     drawCard: () => {
       dispatch(drawCard());
+    },
+    revealAllCard: () => {
+      dispatch(revealAllCard());
     }
   };
 };
@@ -283,7 +413,10 @@ const mapDispatchToProps = dispatch => {
 const mapStateToProps = createStructuredSelector({
   players: selectAllPlayers(),
   currentRound: selectCurrentRound(),
-  isShuffled: selectShuffled()
+  isShuffled: selectShuffled(),
+  isDrawing: selectDrawStatus(),
+  isGameOver: selectIsGameOver(),
+  isShuffleLoading: selectShuffleLoading()
 });
 
 const withConnect = connect(

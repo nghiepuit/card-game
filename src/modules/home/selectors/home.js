@@ -23,10 +23,36 @@ const selectDeckId = () =>
     state => state.get("deck_id")
   );
 
+const selectDrawStatus = () =>
+  createSelector(
+    getState,
+    state => state.get("isDrawing")
+  );
+
 const selectShuffled = () =>
   createSelector(
     getState,
     state => state.get("shuffled")
   );
 
-export { selectAllPlayers, selectCurrentRound, selectDeckId, selectShuffled };
+const selectIsGameOver = () =>
+  createSelector(
+    getState,
+    state => state.get("isGameOver")
+  );
+
+const selectShuffleLoading = () =>
+  createSelector(
+    getState,
+    state => state.get("isShuffleLoading")
+  );
+
+export {
+  selectAllPlayers,
+  selectCurrentRound,
+  selectDeckId,
+  selectShuffled,
+  selectDrawStatus,
+  selectIsGameOver,
+  selectShuffleLoading
+};
